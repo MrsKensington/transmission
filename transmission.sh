@@ -66,8 +66,8 @@ done
 shift $(( OPTIND - 1 ))
 
 [[ "${TZ:-""}" ]] && timezone "$TZ"
-[[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o debian-transmission
-[[ "${GROUPID:-""}" =~ ^[0-9]+$ ]]&& groupmod -g $GROUPID -o debian-transmission
+[[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o transmission
+[[ "${GROUPID:-""}" =~ ^[0-9]+$ ]]&& groupmod -g $GROUPID -o transmission
 for env in $(printenv | grep '^TR_'); do
     name=$(cut -c4- <<< ${env%%=*} | tr '_A-Z' '-a-z')
     val="\"${env##*=}\""
@@ -84,9 +84,9 @@ done
 [[ -d $dir/incomplete ]] || mkdir -p $dir/incomplete
 [[ -d $dir/info/blocklists ]] || mkdir -p $dir/info/blocklists
 
-chown -Rh debian-transmission. $dir 2>&1 | grep -iv 'Read-only' || :
+chown -Rh transmission. $dir 2>&1 | grep -iv 'Read-only' || :
 
-if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
+if [[ $# -ge 1 && -x /usr/bin/transmission.sh ]]; then
     exec "$@"
 elif [[ $# -ge 1 ]]; then
     echo "ERROR: command not found: $1"
@@ -98,8 +98,8 @@ else
     url='http://list.iblocklist.com'
     curl -Ls "$url"'/?list=bt_level1&fileformat=p2p&archiveformat=gz' |
                 gzip -cd >$dir/info/blocklists/bt_level1
-    chown debian-transmission. $dir/info/blocklists/bt_level1
-    exec su -l debian-transmission -s /bin/bash -c "exec transmission-daemon \
+    chown transmission. $dir/info/blocklists/bt_level1
+    exec su -l transmission -s /bin/bash -c "exec transmission-daemon \
                 --config-dir $dir/info --blocklist --foreground --log-error \
                 -e /dev/stdout --no-portmap --download-dir $dir/downloads \
                 --incomplete-dir $dir/incomplete \

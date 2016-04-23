@@ -1,30 +1,26 @@
-FROM debian:jessie
-MAINTAINER David Personette <dperson@dperson.com>
+FROM fedora
+MAINTAINER Michael Ditum <docker@mikeditum.co.uk>
 
 # Install transmission
-RUN export DEBIAN_FRONTEND='noninteractive' && \
-    apt-get update -qq && \
-    apt-get install -qqy --no-install-recommends transmission-daemon curl php5 php5-pecl-http \
-                $(apt-get -s dist-upgrade|awk '/^Inst.*ecurity/ {print $2}') &&\
-    apt-get clean && \
-    dir="/var/lib/transmission-daemon" && \
-    rm $dir/info && \
-    mv $dir/.config/transmission-daemon $dir/info && \
-    rmdir $dir/.config && \
-    usermod -d $dir debian-transmission && \
+RUN dnf install -y \
+        transmission-daemon \
+        php-cli \
+        php-pecl-http
+        
+RUN dir="/var/lib/transmission-daemon" && \
+    usermod -d $dir transmission && \
     [ -d $dir/downloads ] || mkdir -p $dir/downloads && \
     [ -d $dir/incomplete ] || mkdir -p $dir/incomplete && \
     [ -d $dir/info/blocklists ] || mkdir -p $dir/info/blocklists && \
     file="$dir/info/settings.json" && \
+    touch $file && \
     sed -i '/"peer-port"/a\    "peer-socket-tos": "lowcost",' $file && \
-    sed -i '/"port-forwarding-enabled"/a\    "queue-stalled-enabled": true,' \
-                $file && \
-    sed -i '/"queue-stalled-enabled"/a\    "ratio-limit-enabled": true,' \
-                $file && \
+    sed -i '/"port-forwarding-enabled"/a\    "queue-stalled-enabled": true,' $file && \
+    sed -i '/"queue-stalled-enabled"/a\    "ratio-limit-enabled": true,' $file && \
     sed -i '/"rpc-whitelist"/a\    "speed-limit-up": 10,' $file && \
     sed -i '/"speed-limit-up"/a\    "speed-limit-up-enabled": true,' $file && \
-    chown -Rh debian-transmission. $dir && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    chown -Rh transmission. $dir
+
 COPY transmission.sh /usr/bin/
 
 VOLUME ["/var/lib/transmission-daemon"]
