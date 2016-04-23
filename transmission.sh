@@ -100,9 +100,9 @@ else
                 gzip -cd >$dir/info/blocklists/bt_level1
     chown debian-transmission. $dir/info/blocklists/bt_level1
     exec su -l debian-transmission -s /bin/bash -c "exec transmission-daemon \
-                --config-dir $dir/info --blocklist --encryption-preferred \
-                --dht --foreground --log-error -e /dev/stdout --no-portmap \
-                --download-dir $dir/downloads --incomplete-dir $dir/incomplete \
+                --config-dir $dir/info --blocklist --foreground --log-error \
+                -e /dev/stdout --no-portmap --download-dir $dir/downloads \
+                --incomplete-dir $dir/incomplete \
                 $([[ -z ${NOAUTH:-""} ]] && echo '--auth --username \
                 '"${TRUSER:-admin}"' --password '"${TRPASSWD:-admin}") \
                 --allowed \\* 2>&1"
