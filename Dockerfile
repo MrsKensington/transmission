@@ -4,7 +4,7 @@ MAINTAINER David Personette <dperson@dperson.com>
 # Install transmission
 RUN export DEBIAN_FRONTEND='noninteractive' && \
     apt-get update -qq && \
-    apt-get install -qqy --no-install-recommends transmission-daemon curl \
+    apt-get install -qqy --no-install-recommends transmission-daemon curl php5 php5-pecl-http \
                 $(apt-get -s dist-upgrade|awk '/^Inst.*ecurity/ {print $2}') &&\
     apt-get clean && \
     dir="/var/lib/transmission-daemon" && \
